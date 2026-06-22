@@ -1,0 +1,200 @@
+body.theme-dark {
+  --bg-main: #0a0a0a;
+  --bg-card: #121212;
+  --border-color: #262626;
+  --accent: #ff0000;
+  --accent-glow: rgba(255, 0, 0, 0.4);
+  --text-primary: #f3f4f6;
+  --text-secondary: #8a8a8a;
+}
+/* henrique agostinetto piva */
+
+body.theme-light {
+  --bg-main: #ffffff;
+  --bg-card: #f8fafc;
+  --border-color: #e2e8f0;
+  --accent: #cc0000;
+  --accent-glow: rgba(204, 0, 0, 0.2);
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+}
+
+/* estrutura principal da barra */
+.metal-navbar {
+  background: var(--bg-card);
+  border-bottom: 2px solid var(--border-color);
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+
+.metal-brand {
+  color: var(--text-primary);
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  font-size: 1.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.2s ease;
+}
+
+.metal-brand:hover {
+  color: var(--accent);
+}
+
+.metal-menu {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+/* links com efeito de expansao linear */
+.metal-nav-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  padding: 6px 0;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.metal-nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0%;
+  height: 2px;
+  background-color: var(--accent);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(-50%);
+}
+
+.metal-nav-link:hover,
+.metal-nav-link.active {
+  color: var(--text-primary);
+}
+
+.metal-nav-link:hover::after,
+.metal-nav-link.active::after {
+  width: 100%;
+  box-shadow: 0 0 8px var(--accent);
+}
+
+/* secao direita de autenticacao e acoes */
+.metal-user-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.metal-username {
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+
+/* foto com transicao linear de zoom */
+.metal-profile-pic {
+  width: 40px;
+  height: 40px;
+  border-radius: 0;
+  border: 1px solid var(--border-color);
+  object-fit: cover;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.metal-profile-pic:hover {
+  border-color: var(--accent);
+  transform: scale(1.05);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+/* botoes iconograficos de alternancia e saida */
+.theme-toggle-btn,
+.metal-logout-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  transition: all 0.2s ease;
+}
+
+.theme-toggle-btn:hover {
+  color: var(--text-primary);
+  transform: rotate(15deg);
+}
+
+.metal-logout-btn:hover {
+  color: var(--accent);
+}
+
+.metal-hamburger {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* responsivo */
+@media (max-width: 900px) {
+  .metal-navbar {
+    padding: 0 24px;
+  }
+
+  .metal-hamburger {
+    display: block;
+  }
+
+  .metal-menu {
+    position: absolute;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    background: var(--bg-card);
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+    border-bottom: 2px solid var(--border-color);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.25s ease-in-out;
+  }
+
+  .metal-menu.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .metal-nav-link {
+    width: 100%;
+    text-align: center;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .metal-nav-link::after {
+    display: none;
+  }
+}

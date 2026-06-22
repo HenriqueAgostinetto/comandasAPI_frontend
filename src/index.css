@@ -1,0 +1,118 @@
+body.theme-dark {
+  --bg-app: #030712;
+  --bg-surface: #0b1528;
+  --border-main: #1e293b;
+  --accent-blue: #1e40af;
+  --accent-green: #064e3b;
+  --text-main: #ffffff;
+  --text-dim: #94a3b8;
+  --color-error: #ef4444;
+  --color-warning: #f97316;
+  --color-success-animate: #4ade80;
+}
+
+body.theme-light {
+  --bg-app: #f8fafc;
+  --bg-surface: #ffffff;
+  --border-main: #e2e8f0;
+  --accent-blue: #3b82f6;
+  --accent-green: #10b981;
+  --text-main: #0f172a;
+  --text-dim: #64748b;
+  --color-error: #dc2626;
+  --color-warning: #ea580c;
+  --color-success-animate: #22c55e;
+}
+
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes itemIn {
+  0% { opacity: 0; transform: scale(0.95); border-color: var(--color-success-animate); box-shadow: 0 0 12px var(--color-success-animate); }
+  100% { opacity: 1; transform: scale(1); border-color: var(--border-main); }
+}
+
+.animate-page { animation: pageIn 0.35s ease-out forwards; }
+.animate-item { animation: itemIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+body {
+  background-color: var(--bg-app) !important;
+  color: var(--text-main) !important;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+
+*,
+.MuiTypography-root,
+.MuiFormLabel-root,
+.MuiInputBase-input,
+.MuiInputLabel-root,
+.MuiSvgIcon-root {
+  color: var(--text-main) !important;
+  background-color: transparent !important;
+  transition: color 0.25s ease;
+}
+
+.MuiPaper-root,
+.MuiCard-root {
+  background-color: var(--bg-surface) !important;
+  border-color: var(--border-main) !important;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.MuiTypography-body2,
+.MuiTypography-caption,
+.MuiFormLabel-root:not(.Mui-focused) {
+  color: var(--text-dim) !important;
+}
+
+.MuiFormLabel-root.Mui-focused,
+.MuiInputLabel-root.Mui-focused {
+  color: var(--accent-blue) !important;
+}
+
+.MuiInput-underline:before { border-bottom-color: var(--border-main) !important; }
+.MuiInput-underline:after { border-bottom-color: var(--accent-blue) !important; }
+
+::selection {
+  background-color: var(--accent-blue);
+  color: #ffffff;
+}
+
+/* efeito da linha que do link */
+.nav-link-animated {
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.nav-link-animated::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: var(--accent-blue);
+  transform-origin: bottom right;
+  transition: transform 0.25s ease-out;
+}
+
+.nav-link-animated:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+/* efeito de clique em qualquer botao ou icone */
+.click-effect {
+  transition: transform 0.1s ease !important;
+}
+
+.click-effect:active {
+  transform: scale(0.92) !important;
+}
+/* henrique agostinetto piva */
