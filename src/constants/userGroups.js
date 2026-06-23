@@ -1,3 +1,4 @@
+// Henrique Agostinetto Piva
 export const USER_GROUPS = {
     ADMINISTRADOR: 1,
     ATENDENTE: 2,

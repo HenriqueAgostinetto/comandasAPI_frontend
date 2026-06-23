@@ -1,3 +1,4 @@
+// Henrique Agostinetto Piva
 import { Menu, Typography, Box, Avatar, Chip } from '@mui/material';
 import { Email, Phone, Badge, AccountCircle, Work } from '@mui/icons-material';
 import { useAuth } from '../../context/AuthContext';

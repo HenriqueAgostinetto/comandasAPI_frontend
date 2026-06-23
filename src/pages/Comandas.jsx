@@ -1,5 +1,6 @@
+// Henrique Agostinetto Piva
 import { useContext, useEffect, useMemo, useState } from 'react';
-import { Alert, Box, Button, IconButton, MenuItem, Paper, TextField, Tooltip, Typography } from '@mui/material';
+import { Alert, Avatar, Box, Button, Divider, IconButton, MenuItem, Paper, TextField, Tooltip, Typography } from '@mui/material';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
 import { useNavigate } from 'react-router-dom';
 import { API_ENDPOINTS } from '../config/apiConfig';
@@ -17,9 +18,27 @@ export default function Comandas() {
   const [produtos, setProdutos] = useState([]);
   const [quantidades, setQuantidades] = useState({});
   const [comandas, setComandas] = useState([]);
+  const [itensPorComanda, setItensPorComanda] = useState({});
   const [erro, setErro] = useState('');
   const [sucesso, setSucesso] = useState('');
   const [salvando, setSalvando] = useState(false);
+
+  const carregarItensDasComandas = async (abertas) => {
+    const ids = abertas.map((comanda) => comanda.id).filter(Boolean);
+    if (!ids.length) {
+      setItensPorComanda({});
+      return;
+    }
+
+    const detalhesResponse = await apiService.get(
+      API_ENDPOINTS.RECEBIMENTO.DETALHE.replace(':ids', ids.join(',')),
+    );
+    const detalhes = Array.isArray(detalhesResponse.data) ? detalhesResponse.data : [];
+    setItensPorComanda(detalhes.reduce((mapa, comanda) => ({
+      ...mapa,
+      [comanda.id]: Array.isArray(comanda.itens) ? comanda.itens : [],
+    }), {}));
+  };
 
   const carregar = async () => {
     const [comandasResponse, clientesResponse, produtosResponse] = await Promise.all([
@@ -27,21 +46,15 @@ export default function Comandas() {
       apiService.get(API_ENDPOINTS.CLIENTE.LIST),
       apiService.get(API_ENDPOINTS.PRODUTO.LIST),
     ]);
-    setComandas(Array.isArray(comandasResponse.data) ? comandasResponse.data : []);
+    const abertas = Array.isArray(comandasResponse.data) ? comandasResponse.data : [];
+    setComandas(abertas);
     setClientes(Array.isArray(clientesResponse.data) ? clientesResponse.data : []);
     setProdutos(Array.isArray(produtosResponse.data) ? produtosResponse.data : []);
+    await carregarItensDasComandas(abertas);
   };
 
   useEffect(() => {
-    Promise.all([
-      apiService.get(API_ENDPOINTS.RECEBIMENTO.DASHBOARD),
-      apiService.get(API_ENDPOINTS.CLIENTE.LIST),
-      apiService.get(API_ENDPOINTS.PRODUTO.LIST),
-    ]).then(([comandasResponse, clientesResponse, produtosResponse]) => {
-      setComandas(Array.isArray(comandasResponse.data) ? comandasResponse.data : []);
-      setClientes(Array.isArray(clientesResponse.data) ? clientesResponse.data : []);
-      setProdutos(Array.isArray(produtosResponse.data) ? produtosResponse.data : []);
-    }).catch((error) => setErro(error.apiMessage || 'Nao foi possivel carregar os dados das comandas.'));
+    carregar().catch((error) => setErro(error.apiMessage || 'Nao foi possivel carregar os dados das comandas.'));
   }, []);
 
   const total = useMemo(() => produtos.reduce(
@@ -142,15 +155,67 @@ export default function Comandas() {
         <Button variant="outlined" onClick={() => navigate('/caixa')}>Ir para o caixa</Button>
       </Box>
       <Box sx={{ display: 'grid', gap: 1 }}>
-        {comandas.map((comanda) => (
-          <Paper key={comanda.id} variant="outlined" sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2 }}>
-            <Box><Typography fontWeight={800}>{comanda.comanda}</Typography><Typography variant="body2">{comanda.cliente?.nome || 'Cliente nao identificado'} | {comanda.itens_count} item(ns)</Typography></Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography fontWeight={900}>{money.format(comanda.total)}</Typography>
-              <Tooltip title="Excluir comanda"><IconButton color="error" onClick={() => excluirComanda(comanda)}><DeleteOutlineIcon /></IconButton></Tooltip>
-            </Box>
-          </Paper>
-        ))}
+        {comandas.map((comanda) => {
+          const itens = itensPorComanda[comanda.id] || [];
+          return (
+            <Paper key={comanda.id} variant="outlined" sx={{ p: 2, display: 'grid', gap: 1.5 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 2 }}>
+                <Box>
+                  <Typography fontWeight={800}>{comanda.comanda}</Typography>
+                  <Typography variant="body2">
+                    {comanda.cliente?.nome || 'Cliente nao identificado'} | {comanda.itens_count} item(ns)
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography fontWeight={900}>{money.format(comanda.total)}</Typography>
+                  <Tooltip title="Excluir comanda">
+                    <IconButton color="error" onClick={() => excluirComanda(comanda)}>
+                      <DeleteOutlineIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              </Box>
+
+              <Divider />
+
+              <Box sx={{ display: 'grid', gap: 1 }}>
+                {itens.length === 0 ? (
+                  <Typography variant="body2" color="text.secondary">
+                    Nenhum produto listado nesta comanda.
+                  </Typography>
+                ) : itens.map((item) => (
+                  <Box
+                    key={item.id}
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: '44px 1fr auto',
+                      gap: 1.5,
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Avatar
+                      variant="rounded"
+                      src={item.produto?.foto || undefined}
+                      alt={item.produto?.nome || 'Produto'}
+                      sx={{ width: 44, height: 44, borderRadius: 1 }}
+                    />
+                    <Box>
+                      <Typography sx={{ fontSize: 14, fontWeight: 700 }}>
+                        {item.produto?.nome || `Produto #${item.produto_id}`}
+                      </Typography>
+                      <Typography variant="caption">
+                        {item.quantidade} x {money.format(item.valor_unitario)}
+                      </Typography>
+                    </Box>
+                    <Typography sx={{ fontWeight: 800 }}>
+                      {money.format(item.valor_total)}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Paper>
+          );
+        })}
       </Box>
     </Box>
   );
